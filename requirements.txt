@@ -1,0 +1,29 @@
+# ── Web Framework ──
+fastapi
+uvicorn[standard]
+pydantic
+
+# ── DB / Env ──
+python-dotenv
+
+# ── HTTP ──
+requests==2.31.0
+
+# ── Data / ML ──
+numpy==1.26.0
+pandas==2.1.2
+lightgbm
+
+# ── OpenAI (코칭카드) ──
+openai
+
+# ── Parsing ──
+
+
+# ── Web Crawling (선택) ──
+beautifulsoup4==4.12.2
+lxml==4.9.3
+# playwright==1.39.0  # 필요 시 주석 해제 후 playwright install 실행
+
+# ── Demo UI (선택) ──
+# streamlit==1.32.0   # 필요 시 주석 해제
