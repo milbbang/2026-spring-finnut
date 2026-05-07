@@ -107,17 +107,35 @@ def init_db():
     cur.execute("""
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            age INTEGER,
-            student INTEGER,
+            nickname TEXT,
+            gender TEXT,
+            birthdate TEXT,          -- YYYY-MM-DD (나이는 생년월일로 자동 계산)
+            income_level INTEGER,    -- 소득분위 1~10
             region TEXT,
-            category_preference TEXT,
+            school TEXT,             -- 대학생 | 대학원생 | 기타
+            student INTEGER,         -- 0/1
             keywords_json TEXT,
             created_at TEXT,
             updated_at TEXT
         );
     """)
+
+    # 기존 DB 마이그레이션: 컬럼 없으면 추가
+    migration_cols = {
+        "nickname": "TEXT",
+        "gender": "TEXT",
+        "birthdate": "TEXT",
+        "income_level": "INTEGER",
+        "school": "TEXT",
+    }
+    for col, col_type in migration_cols.items():
+        if not _column_exists(conn, "users", col):
+            cur.execute(f"ALTER TABLE users ADD COLUMN {col} {col_type};")
+            print(f"[db] users.{col} 컬럼 추가 완료 (마이그레이션)")
+
+    # category_preference 제거는 SQLite가 DROP COLUMN 미지원이라 그냥 둠
     cur.execute("CREATE INDEX IF NOT EXISTS ix_users_region ON users(region);")
-    cur.execute("CREATE INDEX IF NOT EXISTS ix_users_category ON users(category_preference);")
+    cur.execute("CREATE INDEX IF NOT EXISTS ix_users_school ON users(school);")
 
     # =========================================================
     # 4) policy_eligibility 테이블

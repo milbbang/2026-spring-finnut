@@ -67,12 +67,6 @@ def _score(policy: Dict[str, Any], user: Dict[str, Any], keywords: List[str]) ->
         score -= 50
         reasons.append("현재 마감")
 
-    # 카테고리 선호
-    cp = _norm(user.get("category_preference"))
-    if cp and _norm(policy.get("category")) == cp:
-        score += 40
-        reasons.append(f"선호 카테고리 일치({cp})")
-
     # 키워드 매칭
     blob = " ".join([
         _norm(policy.get("name")),
@@ -117,7 +111,6 @@ def recommend_for_user(
         "age": u["age"],
         "student": (None if u["student"] is None else bool(u["student"])),
         "region": u["region"],
-        "category_preference": u["category_preference"],
         "keywords": json.loads(u["keywords_json"] or "[]"),
     }
 
@@ -161,11 +154,6 @@ def recommend_for_user(
     if user["student"] is not None:
         where.append("(e.student_required IS NULL OR e.student_required = ?)")
         params.append(1 if user["student"] else 0)
-
-    # 카테고리 선호가 있으면 1차로 줄여도 됨(선택)
-    if user["category_preference"]:
-        where.append("(p.category = ?)")
-        params.append(user["category_preference"])
 
     where_sql = ("WHERE " + " AND ".join(where)) if where else ""
 
@@ -236,4 +224,3 @@ def recommend_for_user(
         "include_snippets": include_snippets,
         "items": top,
     }
-    
